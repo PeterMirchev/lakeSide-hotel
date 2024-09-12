@@ -1,5 +1,6 @@
 package com.dailycodework.lakesidehotel.service;
 
+import com.dailycodework.lakesidehotel.exception.InternalServerException;
 import com.dailycodework.lakesidehotel.exception.ResourceNotFoundException;
 import com.dailycodework.lakesidehotel.model.Room;
 import com.dailycodework.lakesidehotel.repository.RoomRepository;
@@ -20,11 +21,14 @@ public class RoomServiceImpl implements RoomService{
     private final RoomRepository roomRepository;
 
     public RoomServiceImpl(RoomRepository repository) {
+
         this.roomRepository = repository;
     }
 
     @Override
-    public Room addNewRoom(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException, SQLException {
+    public Room addNewRoom(MultipartFile photo,
+                           String roomType,
+                           BigDecimal roomPrice) throws IOException, SQLException {
 
         Room room = new Room();
         room.setRoomType(roomType);
@@ -41,6 +45,7 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public List<String> getAllRoomTypes() {
+
         return roomRepository.findDistinctRoomTypes();
     }
 
@@ -59,10 +64,47 @@ public class RoomServiceImpl implements RoomService{
         Blob photoBlob = room.get().getPhoto();
 
         if (photoBlob != null) {
-
             return photoBlob.getBytes(1, (int) photoBlob.length());
         }
 
         return null;
+    }
+
+    @Override
+    public void deleteRoom(Long roomId) {
+
+        Optional.ofNullable(roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid room ID.")));
+
+        roomRepository.deleteById(roomId);
+    }
+
+    @Override
+    public Long count() {
+
+        return roomRepository.count();
+    }
+
+    @Override
+    public Room updateRoom(Long roomId,
+                           String roomType,
+                           BigDecimal roomPrice,
+                           byte[] photoBytes) {
+
+        Optional<Room> room = Optional.ofNullable(roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid room ID.")));
+
+        if (roomType != null) room.get().setRoomType(roomType);
+        if (roomPrice != null) room.get().setRoomPrice(roomPrice);
+        if (photoBytes != null && photoBytes.length > 0) {
+
+            try {
+                room.get().setPhoto(new SerialBlob(photoBytes));
+            } catch (SQLException s) {
+                throw new InternalServerException("Error updating room.");
+            }
+        }
+
+        return roomRepository.save(room.get());
     }
 }

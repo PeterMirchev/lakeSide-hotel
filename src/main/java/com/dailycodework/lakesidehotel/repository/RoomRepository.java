@@ -14,4 +14,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         SELECT DISTINCT r.roomType FROM Room r
         """)
     List<String> findDistinctRoomTypes();
+
 }
