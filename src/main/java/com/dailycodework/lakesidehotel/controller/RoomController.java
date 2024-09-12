@@ -5,7 +5,7 @@ import com.dailycodework.lakesidehotel.exception.ResourceNotFoundException;
 import com.dailycodework.lakesidehotel.model.BookedRoom;
 import com.dailycodework.lakesidehotel.model.Room;
 import com.dailycodework.lakesidehotel.response.RoomResponse;
-import com.dailycodework.lakesidehotel.service.BookingService;
+import com.dailycodework.lakesidehotel.service.BookingServiceImpl;
 import com.dailycodework.lakesidehotel.service.RoomService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -28,10 +27,10 @@ import java.util.Optional;
 public class RoomController {
 
     private final RoomService roomService;
-    private final BookingService bookingService;
+    private final BookingServiceImpl bookingService;
 
     public RoomController(RoomService roomService,
-                          BookingService bookingService) {
+                          BookingServiceImpl bookingService) {
         this.roomService = roomService;
         this.bookingService = bookingService;
     }

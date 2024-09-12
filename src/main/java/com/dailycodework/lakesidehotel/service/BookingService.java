@@ -1,15 +1,15 @@
 package com.dailycodework.lakesidehotel.service;
 
-
 import com.dailycodework.lakesidehotel.model.BookedRoom;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class BookingService {
-    public List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
+public interface BookingService {
+    void cancelBooking(Long bookingId);
 
-        return null;
-    }
+    String saveBooking(Long roomId, BookedRoom bookingRequest);
+
+    BookedRoom findByBookingConfirmationCode(String confirmationCode);
+
+    List<BookedRoom> getAllBookings();
 }

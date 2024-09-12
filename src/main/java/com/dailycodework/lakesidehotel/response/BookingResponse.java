@@ -1,6 +1,5 @@
 package com.dailycodework.lakesidehotel.response;
 
-import com.dailycodework.lakesidehotel.model.Room;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,7 @@ public class BookingResponse{
     private int NumberOfAdults;
     private int totalNumberOfGuest;
     private String bookingConfirmationCode;
-    private Room room;
+    private RoomResponse room;
 
     public BookingResponse(Long id,
                            LocalDate checkInDate,
