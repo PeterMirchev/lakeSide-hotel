@@ -74,10 +74,14 @@ public class BookingController {
 
     }
 
-    @DeleteMapping("/booking/{bookingId}/delete")
-    public void cancelBooking(@PathVariable(name = "bookingId") Long bookingId) {
-
-        bookingService.cancelBooking(bookingId);
+    @DeleteMapping("/{bookingId}/delete")
+    public ResponseEntity<String> cancelBooking(@PathVariable(name = "bookingId") Long bookingId) {
+        try {
+            bookingService.cancelBooking(bookingId);
+            return ResponseEntity.ok("Booking with ID " + bookingId + " has been successfully deleted.");
+        } catch (InvalidBookingRequestException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
 
 

@@ -26,10 +26,13 @@ public class BookingServiceImpl implements BookingService{
         return bookingRepository.findAll();
     }
 
-    @Override
-    public void cancelBooking(Long bookingId) {
 
-        bookingRepository.deleteById(bookingId);
+    public void cancelBooking(Long bookingId) {
+        if (bookingRepository.existsById(bookingId)) {
+            bookingRepository.deleteById(bookingId);
+        } else {
+            throw new InvalidBookingRequestException("Booking with ID " + bookingId + " does not exist.");
+        }
     }
 
     public List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
