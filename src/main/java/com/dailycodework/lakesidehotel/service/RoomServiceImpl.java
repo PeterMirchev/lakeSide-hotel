@@ -1,5 +1,6 @@
 package com.dailycodework.lakesidehotel.service;
 
+import com.dailycodework.lakesidehotel.exception.ResourceNotFoundException;
 import com.dailycodework.lakesidehotel.model.Room;
 import com.dailycodework.lakesidehotel.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -10,14 +11,16 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomServiceImpl implements RoomService{
 
-    private final RoomRepository repository;
+    private final RoomRepository roomRepository;
 
     public RoomServiceImpl(RoomRepository repository) {
-        this.repository = repository;
+        this.roomRepository = repository;
     }
 
     @Override
@@ -33,6 +36,33 @@ public class RoomServiceImpl implements RoomService{
             Blob photoBlob = new SerialBlob(photoByes);
             room.setPhoto(photoBlob);
         }
-        return repository.save(room);
+        return roomRepository.save(room);
+    }
+
+    @Override
+    public List<String> getAllRoomTypes() {
+        return roomRepository.findDistinctRoomTypes();
+    }
+
+    @Override
+    public List<Room> getAllRooms() {
+
+        return roomRepository.findAll();
+    }
+
+    @Override
+    public byte[] getRoomPhotoByRoomId(Long roomId) throws SQLException {
+
+        Optional<Room> room = Optional.ofNullable(roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid room ID.")));
+
+        Blob photoBlob = room.get().getPhoto();
+
+        if (photoBlob != null) {
+
+            return photoBlob.getBytes(1, (int) photoBlob.length());
+        }
+
+        return null;
     }
 }
