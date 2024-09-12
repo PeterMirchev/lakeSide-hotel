@@ -1,6 +1,7 @@
 package com.dailycodework.lakesidehotel.controller;
 
 import com.dailycodework.lakesidehotel.exception.PhotoRetrievalException;
+import com.dailycodework.lakesidehotel.exception.ResourceNotFoundException;
 import com.dailycodework.lakesidehotel.model.BookedRoom;
 import com.dailycodework.lakesidehotel.model.Room;
 import com.dailycodework.lakesidehotel.response.RoomResponse;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
@@ -107,8 +110,37 @@ public class RoomController {
         RoomResponse roomResponse = getRoomResponse(room);
 
         return ResponseEntity.ok(roomResponse);
-
     }
+
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<Optional<RoomResponse>> getRoomById(@PathVariable(name = "roomId") Long roomId) {
+
+        Optional<Room> room = Optional.ofNullable(roomService.getRoomById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid room ID")));
+
+        RoomResponse res = mapToRoomResponse(room);
+        return ResponseEntity.ok(Optional.of(res));
+
+       /* return room.map(r -> {w
+            RoomResponse response = null;
+            try {
+                response = getRoomResponse(r);
+            } catch (PhotoRetrievalException e) {
+                throw new RuntimeException(e);
+            }
+            return ResponseEntity.ok(Optional.of(response));
+        }).orElseThrow(() -> new ResourceNotFoundException("Invalid room ID"));*/
+    }
+
+    private RoomResponse mapToRoomResponse(Optional<Room> room) {
+
+        try {
+            return getRoomResponse(room.get());
+        } catch (PhotoRetrievalException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private RoomResponse getRoomResponse(Room room) throws PhotoRetrievalException {
 
         List<BookedRoom> bookings = getAllBookingsByRoomId(room.getId());

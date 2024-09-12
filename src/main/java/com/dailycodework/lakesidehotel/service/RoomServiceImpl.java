@@ -107,4 +107,11 @@ public class RoomServiceImpl implements RoomService{
 
         return roomRepository.save(room.get());
     }
+
+    @Override
+    public Optional<Room> getRoomById(Long roomId) {
+
+        return Optional.ofNullable(roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid room ID")));
+    }
 }
